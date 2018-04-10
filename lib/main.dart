@@ -78,8 +78,12 @@ class _RepoScreenState extends State<RepoScreen> {
 
   /// List showing fetched repositories
   Widget _repoList() {
-    // TODO: Implement repository list
-    return new Container();
+    return new ListView.builder(
+      itemCount: _repos.length,
+      itemBuilder: (context, position) {
+        return new RepositoryListItem(_repos[position]);
+      },
+    );
   }
 }
 
