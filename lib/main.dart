@@ -12,7 +12,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return new MaterialApp(
       title: "Repo Explorer",
-      theme: new ThemeData(primaryColor: Colors.blueGrey.shade600),
+      theme: new ThemeData(primaryColor: Colors.blue.shade900),
       home: new RepoScreen(),
     );
   }
@@ -27,16 +27,13 @@ class _RepoScreenState extends State<RepoScreen> {
   var _repos = <Repository>[];
   var _isLoading = false;
 
-  @override
-  void initState() {
-    super.initState();
-  }
-
+  /// Load repositories asynchronously for the given search term
   _loadData(String searchTerm) async {
+    final fetcher = new GitHubFetcher.dartRepos();
     setState(() {
       _isLoading = true;
     });
-    final fetcher = new GitHubFetcher.dartRepos();
+
     final result = await fetcher.searchFor(searchTerm);
     setState(() {
       _repos = result;
@@ -44,6 +41,7 @@ class _RepoScreenState extends State<RepoScreen> {
     });
   }
 
+  // Main build method for the widget
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
@@ -53,32 +51,43 @@ class _RepoScreenState extends State<RepoScreen> {
         body: new Container(
           child: new Column(
             children: <Widget>[
-              new TextField(
-                decoration: new InputDecoration(
-                    contentPadding: const EdgeInsets.all(16.0),
-                    hintText: "Search Dart repositories..."),
-                onSubmitted: (text) {
-                  _loadData(text);
-                },
-              ),
+              _searchField(),
               new Expanded(
-                child: _isLoading
-                ? new Center(child: new CircularProgressIndicator()) 
-                : new ListView.builder(
-                  padding: const EdgeInsets.all(8.0),
-                  itemCount: _repos.length * 2,
-                  itemBuilder: (BuildContext context, int position) {
-                    if (position.isOdd) return new Divider();
-
-                    final index = position ~/ 2;
-
-                    return new RepositoryListItem(_repos[index]);
-                  },
-                ),
-              ),
+                  child: _isLoading ? _loadingIndicator() : _repoList())
             ],
           ),
         ));
+  }
+
+  /// Text input for entering search term
+  TextField _searchField() {
+    return new TextField(
+      decoration: new InputDecoration(
+          contentPadding: const EdgeInsets.all(16.0),
+          hintText: "Search Dart repositories..."),
+      onSubmitted: (text) {
+        _loadData(text);
+      },
+    );
+  }
+
+  /// Loading indicator displayed while fetching results
+  Widget _loadingIndicator() {
+    return new Center(child: new CircularProgressIndicator());
+  }
+
+  /// List showing fetched repositories
+  Widget _repoList() {
+    return new ListView.builder(
+      padding: const EdgeInsets.all(8.0),
+      itemCount: _repos.length * 2,
+      itemBuilder: (BuildContext context, int position) {
+        if (position.isOdd) return new Divider();
+
+        final index = position ~/ 2;
+        return new RepositoryListItem(_repos[index]);
+      },
+    );
   }
 }
 
@@ -108,6 +117,7 @@ class GitHubFetcher {
       : apiUrl = 'https://api.github.com/search/repositories',
         language = 'dart';
 
+  /// Asynchronously searches the apiUrl for the search term in the given language
   Future<List<Repository>> searchFor(String searchTerm) async {
     if (searchTerm == null || searchTerm == "") {
       return new List();
@@ -138,30 +148,29 @@ class RepositoryListItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return new ListTile(
-      title: new Text(
-        "${repository.name}",
-        style: _biggerFont,
-      ),
+      title: new Text("${repository.name}", style: _biggerFont),
       subtitle: new Text("${repository.authorName}"),
       leading: new CircleAvatar(
-        backgroundImage: new NetworkImage(repository.authorAvatarUrl),
-      ),
+          backgroundImage: new NetworkImage(repository.authorAvatarUrl)),
       trailing: new Row(
         children: <Widget>[
           new Icon(Icons.star, color: Colors.yellow.shade700),
-          new Text(
-            "${repository.stars}",
-          )
+          new Text("${repository.stars}")
         ],
       ),
       onTap: () {
-        Navigator.push(
-            context,
-            new MaterialPageRoute(
-              builder: (context) => new RepositoryDetailScreen(repository),
-            ));
+        _navigateToRepoDetailScreen(context);
       },
     );
+  }
+
+  /// Navigates to the detail screen of the repository
+  _navigateToRepoDetailScreen(BuildContext context) {
+    Navigator.push(
+        context,
+        new MaterialPageRoute(
+          builder: (context) => new RepositoryDetailScreen(repository),
+        ));
   }
 }
 
@@ -174,28 +183,25 @@ class RepositoryDetailScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
-      appBar: new AppBar(
-        title: new Text("Repository Details"),
-      ),
+      appBar: new AppBar(title: new Text("Repository Details")),
       body: new Container(
         child: new Padding(
           padding: const EdgeInsets.all(32.0),
           child: new Column(
             children: <Widget>[
-              new Text(
-                "${repository.name}",
-                style: _biggerFont,
-              ),
+              new Text("${repository.name}", style: _biggerFont),
               new Container(height: 16.0),
               new Text("${repository.description}"),
               new Container(height: 16.0),
               new RaisedButton(
                 child: new Text("Open"),
-                onPressed: () {_openUrl(repository.url);},
+                onPressed: () {
+                  _openUrl(repository.url);
+                },
               )
             ],
           ),
-        )
+        ),
       ),
     );
   }
