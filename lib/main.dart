@@ -27,6 +27,12 @@ class _RepoScreenState extends State<RepoScreen> {
   var _repos = <Repository>[];
   var _isLoading = false;
 
+  @override
+  void initState() {
+    super.initState();
+    _loadData("calendar");
+  }
+
   /// Load repositories asynchronously for the given search term
   _loadData(String searchTerm) async {
     final fetcher = new GitHubFetcher.dartRepos();
@@ -60,15 +66,9 @@ class _RepoScreenState extends State<RepoScreen> {
   }
 
   /// Text input for entering search term
-  TextField _searchField() {
-    return new TextField(
-      decoration: new InputDecoration(
-          contentPadding: const EdgeInsets.all(16.0),
-          hintText: "Search Dart repositories..."),
-      onSubmitted: (text) {
-        _loadData(text);
-      },
-    );
+  Widget _searchField() {
+    // TODO: Implement search TextField
+    return new Container();
   }
 
   /// Loading indicator displayed while fetching results
@@ -78,16 +78,8 @@ class _RepoScreenState extends State<RepoScreen> {
 
   /// List showing fetched repositories
   Widget _repoList() {
-    return new ListView.builder(
-      padding: const EdgeInsets.all(8.0),
-      itemCount: _repos.length * 2,
-      itemBuilder: (BuildContext context, int position) {
-        if (position.isOdd) return new Divider();
-
-        final index = position ~/ 2;
-        return new RepositoryListItem(_repos[index]);
-      },
-    );
+    // TODO: Implement repository list
+    return new Container();
   }
 }
 
@@ -148,29 +140,13 @@ class RepositoryListItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return new ListTile(
-      title: new Text("${repository.name}", style: _biggerFont),
-      subtitle: new Text("${repository.authorName}"),
-      leading: new CircleAvatar(
-          backgroundImage: new NetworkImage(repository.authorAvatarUrl)),
-      trailing: new Row(
-        children: <Widget>[
-          new Icon(Icons.star, color: Colors.yellow.shade700),
-          new Text("${repository.stars}")
-        ],
-      ),
-      onTap: () {
-        _navigateToRepoDetailScreen(context);
-      },
+      // TODO: Implement ListItem
     );
   }
 
   /// Navigates to the detail screen of the repository
   _navigateToRepoDetailScreen(BuildContext context) {
-    Navigator.push(
-        context,
-        new MaterialPageRoute(
-          builder: (context) => new RepositoryDetailScreen(repository),
-        ));
+    // TODO: Implement navigation
   }
 }
 
