@@ -144,7 +144,17 @@ class RepositoryListItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return new ListTile(
-      // TODO: Implement ListItem
+      title: new Text("${repository.name}", style: _biggerFont),
+      subtitle: new Text("${repository.authorName}"),
+      leading: new CircleAvatar(
+        backgroundImage: new NetworkImage(repository.authorAvatarUrl),
+      ),
+      trailing: new Row(
+        children: <Widget>[
+          new Icon(Icons.star, color: Colors.yellow.shade800,),
+          new Text("${repository.stars}")
+        ],
+      ),
     );
   }
 
